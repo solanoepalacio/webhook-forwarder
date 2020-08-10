@@ -11,6 +11,7 @@ print('port', PORT)
 class GetHandler(server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
+        print(f'Hello from server in port {PORT}')
         with open(f'./logs-{PORT}', 'w') as file:
             file.write(f'got request! {self.address_string}')
             file.close()

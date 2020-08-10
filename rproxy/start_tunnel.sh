@@ -11,7 +11,7 @@ mkdir ~/.ssh
 touch ~/.ssh/known_hosts
 ssh-keyscan -H $FORWARD_FROM_HOST >> ~/.ssh/known_hosts
 
-CMD="ssh -i ./key.pem -nN -y -R $FORWARD_FROM_PORT:$FORWARD_TO_HOST:$FORWARD_TO_PORT ec2-user@$FORWARD_FROM_HOST"
+CMD="ssh -i ./key.pem -nN -R $FORWARD_FROM_PORT:$FORWARD_TO_HOST:$FORWARD_TO_PORT ec2-user@$FORWARD_FROM_HOST"
 
 echo $CMD
 

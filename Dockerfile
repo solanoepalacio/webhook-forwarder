@@ -5,12 +5,12 @@ COPY teeproxy.go ./
 RUN go build -o teeproxy
 
 FROM alpine:3.5 AS runner
+
+WORKDIR /code
+
 COPY --from=builder /go/src/teeproxy/teeproxy /usr/local/bin
 
-CMD ["teeproxy", "-l=:5000", \
-    "-a", "172.17.0.1:8000", \
-    "-b", "172.17.0.1:8001", \
-    "-b", "172.17.0.1:8002", \
-    "-b", "172.17.0.1:8003", \
-    "-b", "172.17.0.1:8004", \
-    "-debug", "true"]
+COPY ./start_proxy_server.sh /code
+RUN chmod u+x /code/start_proxy_server.sh
+
+CMD ["/bin/sh", "./start_proxy_server.sh"]

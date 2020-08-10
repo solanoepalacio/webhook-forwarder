@@ -1,0 +1,14 @@
+version: '3'
+services:
+  local-listeners-mock:
+    build: ./sample-listeners
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+      - "8003:8003"
+      - "8004:8004"
+  webhook-forwarder:
+    ports:
+      - "5000:5000"
+    build: .

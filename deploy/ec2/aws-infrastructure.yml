@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Deploys a ready to be used webhook forwarder instance to EC2
+
+Parameters:
+  EC2KeyName:
+    Type: String
+    Description: AWS SSH Key Name
+  InstanceInitScript:
+    Type: String
+    Description: >
+      Install nodejs server that logs locally to the instance and responds with the hostname
+  ListenPort:
+    Type: String
+    Description: >
+      Port webhook-forwarder will be listening in. An SG will be attached allowing inbound traffic to this port
+  AmiId:
+    Type: String
+    Description: AWS Machine Image ID
+
+Resources:
+  WebhookForwarderSSH:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: EC2 instance ssh access for reverse tunneling
+      GroupName: WebhookForwarderSSH
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+  WebhookForwarderInboundTrafficSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Members of group are allowd to send requests to WebhookForwarderSG
+      GroupName: WebhookForwarderInboundTrafficSG
+
+  WebhookForwarderSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: allows inbound traffic from WebhookForwarderInboundTrafficSG
+      GroupName: WebhookForwarderSG
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort:
+            Ref: ListenPort
+          ToPort:
+            Ref: ListenPort
+          SourceSecurityGroupName: !Ref WebhookForwarderInboundTrafficSG
+
+  WebhookForwarder:
+    Type: "AWS::EC2::Instance"
+    DependsOn:
+    - WebhookForwarderSG
+    - WebhookForwarderSSH
+    Properties:
+      KeyName:
+        Ref: EC2KeyName
+      ImageId:
+        Ref: AmiId # aws linux 2
+      InstanceType: t2.micro
+      UserData:
+        Ref: InstanceInitScript
+      AvailabilityZone: "sa-east-1a"
+      SecurityGroups:
+      - !Ref WebhookForwarderSG
+      - !Ref WebhookForwarderSSH

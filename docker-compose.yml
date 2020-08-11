@@ -13,18 +13,22 @@ services:
     build: ./teeproxy
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
-      CLONE_COUNT: 5
-      TARGET_PORT: 8000
-      LISTEN_PORT: 5000
-      TARGET_HOST: 172.17.0.1
+      CLONE_COUNT: ${CLONE_COUNT}
+      TARGET_PORT: ${TARGET_PORT}
+      LISTEN_PORT: ${LISTEN_PORT}
+      TARGET_HOST: ${TARGET_HOST}
   
   rproxy:
     build: ./rproxy
+    env_file:
+      - .env
     environment:
-      FORWARD_FROM_PORT: 8000
-      FORWARD_FROM_HOST: 3.128.226.10
-      FORWARD_TO_PORT: 8000
-      FORWARD_TO_HOST: 172.17.0.1
+      FORWARD_FROM_PORT: ${FORWARD_FROM_PORT}
+      FORWARD_FROM_HOST: ${FORWARD_FROM_HOST}
+      FORWARD_TO_PORT: ${FORWARD_TO_PORT}
+      FORWARD_TO_HOST: ${FORWARD_TO_HOST}
     volumes:
-      - ~/.ssh/webhook-fwd.pem:/code/key.pem
+      - ./sa-east-1.webhook-fwd.pem:/code/key.pem
